@@ -216,8 +216,15 @@ function renderPlayers(players) {
     }
 
     els.tbody.innerHTML = "";
+    let prevOwner = null;
     players.forEach(function (p) {
         const tr = document.createElement("tr");
+        const currentOwner = (p.owner || "").trim().toLowerCase();
+        if (prevOwner !== null && currentOwner !== prevOwner) {
+            tr.classList.add("owner-group-start");
+        }
+        prevOwner = currentOwner;
+
         tr.appendChild(nameCell(p.name));
         tr.appendChild(classCell(p.class));
         tr.appendChild(specCell(p.class, p.spec));

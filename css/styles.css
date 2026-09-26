@@ -187,6 +187,11 @@ tbody tr:hover {
     background: rgba(244, 196, 48, 0.10);
 }
 
+/* Separación marcada al cambiar de Jugador */
+tbody tr.owner-group-start td {
+    border-top: 3px solid var(--accent);
+}
+
 .empty {
     text-align: center;
     color: var(--muted);
