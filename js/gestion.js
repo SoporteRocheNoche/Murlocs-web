@@ -10,6 +10,7 @@ const els = {
     refreshBtn: document.getElementById("refreshBtn"),
     searchInput: document.getElementById("searchInput"),
     listMessage: document.getElementById("listMessage"),
+    ownerList: document.getElementById("ownerList"),
     // Modal
     modal: document.getElementById("editModal"),
     editForm: document.getElementById("edit-form"),
@@ -144,6 +145,8 @@ async function postAction(payload) {
 // ---------- Render ----------
 
 function renderFiltered() {
+    populateOwnerOptions(allPlayers);
+
     const term = els.searchInput.value.trim().toLowerCase();
     const filtered = term
         ? allPlayers.filter(function (p) {
@@ -152,6 +155,24 @@ function renderFiltered() {
         })
         : allPlayers;
     renderPlayers(filtered);
+}
+
+function populateOwnerOptions(players) {
+    if (!els.ownerList) return;
+
+    const owners = [];
+    (players || []).forEach(function (p) {
+        const value = (p.owner || "").trim();
+        if (value && owners.indexOf(value) === -1) owners.push(value);
+    });
+    owners.sort(function (a, b) { return a.localeCompare(b); });
+
+    els.ownerList.innerHTML = "";
+    owners.forEach(function (owner) {
+        const opt = document.createElement("option");
+        opt.value = owner;
+        els.ownerList.appendChild(opt);
+    });
 }
 
 function renderPlayers(players) {

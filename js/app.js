@@ -9,6 +9,7 @@ const els = {
     form: document.getElementById("player-form"),
     name: document.getElementById("playerName"),
     owner: document.getElementById("playerOwner"),
+    ownerList: document.getElementById("ownerList"),
     class: document.getElementById("playerClass"),
     spec: document.getElementById("playerSpec"),
     prof1: document.getElementById("playerProf1"),
@@ -196,6 +197,8 @@ async function addPlayer(player) {
 // ---------- Render ----------
 
 function renderPlayers(players) {
+    populateOwnerOptions(players);
+
     if (!players || players.length === 0) {
         els.tbody.innerHTML = '<tr><td colspan="6" class="empty">No hay jugadores todavía.</td></tr>';
         return;
@@ -211,6 +214,25 @@ function renderPlayers(players) {
         tr.appendChild(textCell(p.prof2));
         tr.appendChild(textCell(p.owner));
         els.tbody.appendChild(tr);
+    });
+}
+
+function populateOwnerOptions(players) {
+    if (!els.ownerList) return;
+
+    // Nombres de "Jugador" únicos y ordenados
+    const owners = [];
+    (players || []).forEach(function (p) {
+        const value = (p.owner || "").trim();
+        if (value && owners.indexOf(value) === -1) owners.push(value);
+    });
+    owners.sort(function (a, b) { return a.localeCompare(b); });
+
+    els.ownerList.innerHTML = "";
+    owners.forEach(function (owner) {
+        const opt = document.createElement("option");
+        opt.value = owner;
+        els.ownerList.appendChild(opt);
     });
 }
 
