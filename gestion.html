@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gestionar jugadores - Roster de la Guild</title>
+    <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+    <header class="topbar">
+        <h1>🐟 Roster de la Guild</h1>
+        <p class="subtitle">Editar y eliminar jugadores</p>
+        <nav class="nav">
+            <a class="nav-link" href="index.html">Añadir jugador</a>
+            <a class="nav-link active" href="gestion.html">Gestionar jugadores</a>
+        </nav>
+    </header>
+
+    <main class="container">
+        <section class="card table-card">
+            <div class="table-header">
+                <h2>Jugadores</h2>
+                <div class="table-actions">
+                    <input type="text" id="searchInput" class="search-input" placeholder="Buscar por nombre..." />
+                    <button id="refreshBtn" class="btn-secondary">? Recargar</button>
+                </div>
+            </div>
+            <p id="listMessage" class="message"></p>
+            <div class="table-wrapper">
+                <table id="players-table">
+                    <thead>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Clase</th>
+                            <th>Especialización</th>
+                            <th>Profesión 1</th>
+                            <th>Profesión 2</th>
+                            <th class="actions-col">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="players-tbody">
+                        <tr><td colspan="6" class="empty">Cargando...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <!-- Modal de edición -->
+    <div id="editModal" class="modal-overlay hidden">
+        <div class="modal card">
+            <h2>Editar jugador</h2>
+            <form id="edit-form" class="player-form">
+                <input type="hidden" id="editId" />
+
+                <div class="field">
+                    <label for="editName">Nombre del personaje</label>
+                    <input type="text" id="editName" required />
+                </div>
+
+                <div class="field">
+                    <label for="editClass">Clase</label>
+                    <select id="editClass" required>
+                        <option value="" disabled>Selecciona una clase</option>
+                    </select>
+                </div>
+
+                <div class="field">
+                    <label for="editSpec">Especialización</label>
+                    <select id="editSpec" required>
+                        <option value="" disabled>Selecciona primero una clase</option>
+                    </select>
+                </div>
+
+                <div class="field">
+                    <label for="editProf1">Profesión 1</label>
+                    <select id="editProf1">
+                        <option value="">-- Ninguna --</option>
+                    </select>
+                </div>
+
+                <div class="field">
+                    <label for="editProf2">Profesión 2</label>
+                    <select id="editProf2">
+                        <option value="">-- Ninguna --</option>
+                    </select>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn-secondary" id="cancelEditBtn">Cancelar</button>
+                    <button type="submit" class="btn-primary" id="saveEditBtn">Guardar cambios</button>
+                </div>
+            </form>
+            <p id="editMessage" class="message"></p>
+        </div>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script src="js/gestion.js"></script>
+</body>
+</html>

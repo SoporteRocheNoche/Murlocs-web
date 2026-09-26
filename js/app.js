@@ -122,7 +122,6 @@ async function handleSubmit(event) {
         prof1: els.prof1.value,
         prof2: els.prof2.value
     };
-
     if (!player.name || !player.class || !player.spec) {
         showMessage("Rellena nombre, clase y especialización.", "error");
         return;
