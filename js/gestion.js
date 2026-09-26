@@ -15,6 +15,7 @@ const els = {
     editForm: document.getElementById("edit-form"),
     editId: document.getElementById("editId"),
     editName: document.getElementById("editName"),
+    editOwner: document.getElementById("editOwner"),
     editClass: document.getElementById("editClass"),
     editSpec: document.getElementById("editSpec"),
     editProf1: document.getElementById("editProf1"),
@@ -113,7 +114,7 @@ async function loadPlayers() {
         return;
     }
 
-    els.tbody.innerHTML = '<tr><td colspan="6" class="empty">Cargando...</td></tr>';
+    els.tbody.innerHTML = '<tr><td colspan="7" class="empty">Cargando...</td></tr>';
     showListMessage("", "");
 
     try {
@@ -123,7 +124,7 @@ async function loadPlayers() {
         renderFiltered();
     } catch (err) {
         els.tbody.innerHTML =
-            '<tr><td colspan="6" class="empty">Error al cargar: ' + err.message + "</td></tr>";
+            '<tr><td colspan="7" class="empty">Error al cargar: ' + err.message + "</td></tr>";
     }
 }
 
@@ -146,7 +147,8 @@ function renderFiltered() {
     const term = els.searchInput.value.trim().toLowerCase();
     const filtered = term
         ? allPlayers.filter(function (p) {
-            return (p.name || "").toLowerCase().indexOf(term) !== -1;
+            return (p.name || "").toLowerCase().indexOf(term) !== -1 ||
+                (p.owner || "").toLowerCase().indexOf(term) !== -1;
         })
         : allPlayers;
     renderPlayers(filtered);
@@ -154,7 +156,7 @@ function renderFiltered() {
 
 function renderPlayers(players) {
     if (!players || players.length === 0) {
-        els.tbody.innerHTML = '<tr><td colspan="6" class="empty">No hay jugadores.</td></tr>';
+        els.tbody.innerHTML = '<tr><td colspan="7" class="empty">No hay jugadores.</td></tr>';
         return;
     }
 
@@ -166,6 +168,7 @@ function renderPlayers(players) {
         tr.appendChild(specCell(p.class, p.spec));
         tr.appendChild(textCell(p.prof1));
         tr.appendChild(textCell(p.prof2));
+        tr.appendChild(textCell(p.owner));
         tr.appendChild(actionsCell(p));
         els.tbody.appendChild(tr);
     });
@@ -250,6 +253,7 @@ async function confirmDelete(player) {
 function openModal(player) {
     els.editId.value = player.id || "";
     els.editName.value = player.name || "";
+    els.editOwner.value = player.owner || "";
     els.editClass.value = player.class || "";
     populateEditSpecs(player.class, player.spec);
     els.editProf1.value = player.prof1 || "";
@@ -269,6 +273,7 @@ async function handleEditSubmit(event) {
         action: "update",
         id: els.editId.value,
         name: els.editName.value.trim(),
+        owner: els.editOwner.value.trim(),
         class: els.editClass.value,
         spec: els.editSpec.value,
         prof1: els.editProf1.value,

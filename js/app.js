@@ -8,6 +8,7 @@ let masterData = { classes: [], professions: [] };
 const els = {
     form: document.getElementById("player-form"),
     name: document.getElementById("playerName"),
+    owner: document.getElementById("playerOwner"),
     class: document.getElementById("playerClass"),
     spec: document.getElementById("playerSpec"),
     prof1: document.getElementById("playerProf1"),
@@ -117,6 +118,7 @@ async function handleSubmit(event) {
 
     const player = {
         name: els.name.value.trim(),
+        owner: els.owner.value.trim(),
         class: els.class.value,
         spec: els.spec.value,
         prof1: els.prof1.value,
@@ -160,7 +162,7 @@ async function loadPlayers() {
         return;
     }
 
-    els.tbody.innerHTML = '<tr><td colspan="5" class="empty">Cargando...</td></tr>';
+    els.tbody.innerHTML = '<tr><td colspan="6" class="empty">Cargando...</td></tr>';
 
     try {
         const res = await fetch(CONFIG.SHEETS_API_URL);
@@ -169,7 +171,7 @@ async function loadPlayers() {
         renderPlayers(players);
     } catch (err) {
         els.tbody.innerHTML =
-            '<tr><td colspan="5" class="empty">Error al cargar: ' + err.message + "</td></tr>";
+            '<tr><td colspan="6" class="empty">Error al cargar: ' + err.message + "</td></tr>";
     }
 }
 
@@ -195,7 +197,7 @@ async function addPlayer(player) {
 
 function renderPlayers(players) {
     if (!players || players.length === 0) {
-        els.tbody.innerHTML = '<tr><td colspan="5" class="empty">No hay jugadores todavía.</td></tr>';
+        els.tbody.innerHTML = '<tr><td colspan="6" class="empty">No hay jugadores todavía.</td></tr>';
         return;
     }
 
@@ -207,6 +209,7 @@ function renderPlayers(players) {
         tr.appendChild(specCell(p.class, p.spec));
         tr.appendChild(textCell(p.prof1));
         tr.appendChild(textCell(p.prof2));
+        tr.appendChild(textCell(p.owner));
         els.tbody.appendChild(tr);
     });
 }

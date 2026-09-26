@@ -21,7 +21,7 @@
  */
 
 var SHEET_NAME = "Jugadores";
-var HEADERS = ["ID", "Nombre", "Clase", "Especializacion", "Profesion1", "Profesion2"];
+var HEADERS = ["ID", "Nombre", "Clase", "Especializacion", "Profesion1", "Profesion2", "Jugador"];
 
 function getSheet() {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
@@ -48,7 +48,8 @@ function doGet() {
       class: row[2],
       spec: row[3],
       prof1: row[4],
-      prof2: row[5]
+      prof2: row[5],
+      owner: row[6]
     });
   }
 
@@ -84,7 +85,8 @@ function addPlayer(data) {
     data.class,
     data.spec,
     data.prof1 || "",
-    data.prof2 || ""
+    data.prof2 || "",
+    data.owner || ""
   ]);
 
   return jsonResponse({ success: true, id: id });
@@ -107,7 +109,8 @@ function updatePlayer(data) {
     data.class,
     data.spec,
     data.prof1 || "",
-    data.prof2 || ""
+    data.prof2 || "",
+    data.owner || ""
   ]]);
 
   return jsonResponse({ success: true });
