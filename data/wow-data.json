@@ -1,0 +1,110 @@
+{
+  "classes": [
+    {
+      "name": "Caballero de la Muerte",
+      "color": "#C41E3A",
+      "specs": [
+        { "name": "Sangre", "icon": "img/specs/caballero-de-la-muerte-sangre.jpg" },
+        { "name": "Escarcha", "icon": "img/specs/caballero-de-la-muerte-escarcha.jpg" },
+        { "name": "Profano", "icon": "img/specs/caballero-de-la-muerte-profano.jpg" }
+      ]
+    },
+    {
+      "name": "Druida",
+      "color": "#FF7C0A",
+      "specs": [
+        { "name": "Equilibrio", "icon": "img/specs/druida-equilibrio.jpg" },
+        { "name": "Feral", "icon": "img/specs/druida-feral.jpg" },
+        { "name": "Restauración", "icon": "img/specs/druida-restauracion.jpg" }
+      ]
+    },
+    {
+      "name": "Cazador",
+      "color": "#AAD372",
+      "specs": [
+        { "name": "Bestias", "icon": "img/specs/cazador-bestias.jpg" },
+        { "name": "Puntería", "icon": "img/specs/cazador-punteria.jpg" },
+        { "name": "Supervivencia", "icon": "img/specs/cazador-supervivencia.jpg" }
+      ]
+    },
+    {
+      "name": "Mago",
+      "color": "#3FC7EB",
+      "specs": [
+        { "name": "Arcano", "icon": "img/specs/mago-arcano.jpg" },
+        { "name": "Fuego", "icon": "img/specs/mago-fuego.jpg" },
+        { "name": "Escarcha", "icon": "img/specs/mago-escarcha.jpg" }
+      ]
+    },
+    {
+      "name": "Paladín",
+      "color": "#F48CBA",
+      "specs": [
+        { "name": "Sagrado", "icon": "img/specs/paladin-sagrado.jpg" },
+        { "name": "Protección", "icon": "img/specs/paladin-proteccion.jpg" },
+        { "name": "Reprensión", "icon": "img/specs/paladin-reprension.jpg" }
+      ]
+    },
+    {
+      "name": "Sacerdote",
+      "color": "#FFFFFF",
+      "specs": [
+        { "name": "Disciplina", "icon": "img/specs/sacerdote-disciplina.jpg" },
+        { "name": "Sagrado", "icon": "img/specs/sacerdote-sagrado.jpg" },
+        { "name": "Sombra", "icon": "img/specs/sacerdote-sombra.jpg" }
+      ]
+    },
+    {
+      "name": "Pícaro",
+      "color": "#FFF468",
+      "specs": [
+        { "name": "Asesinato", "icon": "img/specs/picaro-asesinato.jpg" },
+        { "name": "Combate", "icon": "img/specs/picaro-combate.jpg" },
+        { "name": "Sutileza", "icon": "img/specs/picaro-sutileza.jpg" }
+      ]
+    },
+    {
+      "name": "Chamán",
+      "color": "#0070DD",
+      "specs": [
+        { "name": "Elemental", "icon": "img/specs/chaman-elemental.jpg" },
+        { "name": "Mejora", "icon": "img/specs/chaman-mejora.jpg" },
+        { "name": "Restauración", "icon": "img/specs/chaman-restauracion.jpg" }
+      ]
+    },
+    {
+      "name": "Brujo",
+      "color": "#8788EE",
+      "specs": [
+        { "name": "Aflicción", "icon": "img/specs/brujo-afliccion.jpg" },
+        { "name": "Demonología", "icon": "img/specs/brujo-demonologia.jpg" },
+        { "name": "Destrucción", "icon": "img/specs/brujo-destruccion.jpg" }
+      ]
+    },
+    {
+      "name": "Guerrero",
+      "color": "#C69B6D",
+      "specs": [
+        { "name": "Armas", "icon": "img/specs/guerrero-armas.jpg" },
+        { "name": "Furia", "icon": "img/specs/guerrero-furia.jpg" },
+        { "name": "Protección", "icon": "img/specs/guerrero-proteccion.jpg" }
+      ]
+    }
+  ],
+  "professions": [
+    "Alquimia",
+    "Herrería",
+    "Encantamiento",
+    "Ingeniería",
+    "Herboristería",
+    "Inscripción",
+    "Joyería",
+    "Peletería",
+    "Minería",
+    "Desuello",
+    "Sastrería",
+    "Cocina",
+    "Primeros Auxilios",
+    "Pesca"
+  ]
+}
