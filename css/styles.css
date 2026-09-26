@@ -212,17 +212,19 @@ select#playerClass {
 }
 
 .nav-link {
-    color: var(--muted);
+    color: var(--text);
     text-decoration: none;
     padding: 6px 14px;
     border-radius: 8px;
     border: 1px solid var(--border);
+    background: #33333f;
     font-size: 0.9rem;
 }
 
 .nav-link:hover {
+    background: #40404e;
     border-color: var(--accent);
-    color: var(--text);
+    color: #ffffff;
 }
 
 .nav-link.active {
