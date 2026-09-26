@@ -168,12 +168,23 @@ async function loadPlayers() {
     try {
         const res = await fetch(CONFIG.SHEETS_API_URL);
         if (!res.ok) throw new Error("HTTP " + res.status);
-        const players = await res.json();
+        const players = sortPlayers(await res.json());
         renderPlayers(players);
     } catch (err) {
         els.tbody.innerHTML =
             '<tr><td colspan="6" class="empty">Error al cargar: ' + err.message + "</td></tr>";
     }
+}
+
+// Ordena por Jugador y luego por Nombre de personaje (alfabético, sin distinguir mayúsculas)
+function sortPlayers(players) {
+    return (players || []).slice().sort(function (a, b) {
+        const ownerA = (a.owner || "").toLowerCase();
+        const ownerB = (b.owner || "").toLowerCase();
+        const byOwner = ownerA.localeCompare(ownerB);
+        if (byOwner !== 0) return byOwner;
+        return (a.name || "").toLowerCase().localeCompare((b.name || "").toLowerCase());
+    });
 }
 
 async function addPlayer(player) {
