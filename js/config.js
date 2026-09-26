@@ -10,5 +10,5 @@
  */
 const CONFIG = {
     // URL del Web App de Google Apps Script (termina en /exec)
-    SHEETS_API_URL: "https://script.google.com/macros/s/AKfycbzeJGKcx6xGbneYSJ_WbeG7nTkETFMLUgszDgfQqcKqCG2V3Nlg670Sdg-ew7CQ_tpAJA/exec"
+    SHEETS_API_URL: "https://script.google.com/macros/s/AKfycbx4YLDVTpwn2HQRTZ_3tsGYJa-qBNFxIoXBl_ev7Otm_3QfXu0ErqpGx959SOUhYnCzsw/exec"
 };
