@@ -171,8 +171,20 @@ th {
     letter-spacing: 0.5px;
 }
 
+tbody tr {
+    border-bottom: 2px solid #14141a;
+}
+
+tbody tr:nth-child(odd) {
+    background: rgba(255, 255, 255, 0.02);
+}
+
+tbody tr:nth-child(even) {
+    background: rgba(255, 255, 255, 0.05);
+}
+
 tbody tr:hover {
-    background: rgba(255, 255, 255, 0.03);
+    background: rgba(244, 196, 48, 0.10);
 }
 
 .empty {
