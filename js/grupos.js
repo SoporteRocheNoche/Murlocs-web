@@ -21,11 +21,34 @@ const els = {
 
 document.addEventListener("DOMContentLoaded", init);
 
+const AUTO_REFRESH_MS = 30000;
+let loadToken = 0;
+
 async function init() {
     await loadMasterData();
-    els.refreshBtn.addEventListener("click", loadData);
+    els.refreshBtn.addEventListener("click", function () { loadData(); });
     els.searchInput.addEventListener("input", renderPool);
+
+    // Volver a la pestaña o volver atrás con el navegador: recargar datos
+    document.addEventListener("visibilitychange", function () {
+        if (document.visibilityState === "visible") refreshInBackground();
+    });
+    window.addEventListener("pageshow", function (e) {
+        if (e.persisted) refreshInBackground();
+    });
+
+    // Refresco periódico para ver los cambios de otros miembros
+    setInterval(function () {
+        if (document.visibilityState === "visible") refreshInBackground();
+    }, AUTO_REFRESH_MS);
+
     await loadData();
+}
+
+// Recarga silenciosa; no interrumpe un arrastre ni un guardado en curso
+function refreshInBackground() {
+    if (drag || busy) return;
+    loadData({ silent: true });
 }
 
 // ---------- Datos ----------
@@ -40,17 +63,28 @@ async function loadMasterData() {
     }
 }
 
-async function loadData() {
+async function loadData(options) {
+    const silent = !!(options && options.silent);
+
     if (!CONFIG.SHEETS_API_URL || CONFIG.SHEETS_API_URL.indexOf("http") !== 0) {
         showMessage("Configura la URL de Google Sheets en js/config.js", "error");
         return;
     }
 
-    showMessage("Cargando...", "");
+    // Si llegan varias respuestas, solo se aplica la de la última petición
+    const token = ++loadToken;
+
+    if (!silent) showMessage("Cargando...", "");
     try {
-        const res = await fetch(CONFIG.SHEETS_API_URL + "?type=all");
+        // Parámetro _ para evitar que el navegador devuelva datos en caché
+        const url = CONFIG.SHEETS_API_URL + "?type=all&_=" + Date.now();
+        const res = await fetch(url, { cache: "no-store" });
         if (!res.ok) throw new Error("HTTP " + res.status);
         const data = await res.json();
+
+        if (token !== loadToken) return;
+        // No redibujar en mitad de un arrastre; se aplicará en el siguiente refresco
+        if (drag && drag.ghost) return;
 
         if (Array.isArray(data)) {
             // El Apps Script desplegado es una versión antigua sin soporte de grupos
@@ -60,10 +94,11 @@ async function loadData() {
         } else {
             players = data.players || [];
             groups = data.groups || [];
-            showMessage("", "");
+            if (!silent) showMessage("", "");
         }
         render();
     } catch (err) {
+        if (token !== loadToken) return;
         showMessage("Error al cargar: " + err.message, "error");
     }
 }
@@ -481,6 +516,9 @@ async function movePlayer(p, groupId) {
     } finally {
         setBusy(false);
     }
+
+    // Sincronizar con la hoja para ver también los cambios de otros
+    await loadData({ silent: true });
 }
 
 async function createGroupWith(p) {
@@ -503,10 +541,11 @@ async function createGroupWith(p) {
         showMessage("Grupo \"" + finalName + "\" creado.", "success");
     } catch (err) {
         showMessage("Error al crear el grupo: " + err.message, "error");
-        await loadData();
     } finally {
         setBusy(false);
     }
+
+    await loadData({ silent: true });
 }
 
 async function renameGroup(group) {
@@ -527,6 +566,8 @@ async function renameGroup(group) {
     } finally {
         setBusy(false);
     }
+
+    await loadData({ silent: true });
 }
 
 async function deleteGroup(group) {
@@ -550,6 +591,8 @@ async function deleteGroup(group) {
     } finally {
         setBusy(false);
     }
+
+    await loadData({ silent: true });
 }
 
 // ---------- Utilidades UI ----------
