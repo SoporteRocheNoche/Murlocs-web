@@ -20,7 +20,7 @@
  * ID | Nombre | Clase | Especializacion | Profesion1 | Profesion2 | Jugador | Nivel | Grupo
  *
  * Hoja "Grupos" (fila 1):
- * ID | Nombre | Notas
+ * ID | Nombre | Notas | Objetivo | Fecha | Hora | NivelMin | NivelMax
  *
  * GET  ?type=players (por defecto) | ?type=groups | ?type=all
  * POST action: add | update | delete | setLevel | setGroup |
@@ -31,7 +31,7 @@ var SHEET_NAME = "Jugadores";
 var HEADERS = ["ID", "Nombre", "Clase", "Especializacion", "Profesion1", "Profesion2", "Jugador", "Nivel", "Grupo"];
 
 var GROUPS_SHEET_NAME = "Grupos";
-var GROUP_HEADERS = ["ID", "Nombre", "Notas"];
+var GROUP_HEADERS = ["ID", "Nombre", "Notas", "Objetivo", "Fecha", "Hora", "NivelMin", "NivelMax"];
 
 // Columnas (1-based) de la hoja Jugadores
 var COL_LEVEL = 8;
@@ -99,11 +99,50 @@ function readGroups() {
     groups.push({
       id: row[0],
       name: row[1],
-      notes: row[2] === undefined ? "" : row[2]
+      notes: textOf(row[2]),
+      target: textOf(row[3]),
+      date: formatDateCell(row[4]),
+      time: formatTimeCell(row[5]),
+      minLevel: normalizeLevel(row[6]),
+      maxLevel: normalizeLevel(row[7])
     });
   }
 
   return groups;
+}
+
+function textOf(value) {
+  return value === undefined || value === null ? "" : String(value);
+}
+
+// Devuelve la fecha como AAAA-MM-DD aunque la celda tenga formato de fecha
+function formatDateCell(value) {
+  if (value instanceof Date) {
+    return Utilities.formatDate(value, Session.getScriptTimeZone(), "yyyy-MM-dd");
+  }
+  return textOf(value);
+}
+
+// Devuelve la hora como HH:MM aunque la celda tenga formato de hora
+function formatTimeCell(value) {
+  if (value instanceof Date) {
+    return Utilities.formatDate(value, Session.getScriptTimeZone(), "HH:mm");
+  }
+  return textOf(value);
+}
+
+// Fila completa de un grupo para escribir en la hoja
+function groupRow(id, data) {
+  return [
+    id,
+    data.name,
+    data.notes || "",
+    data.target || "",
+    data.date || "",
+    data.time || "",
+    normalizeLevel(data.minLevel),
+    normalizeLevel(data.maxLevel)
+  ];
 }
 
 // ---------- POST ----------
@@ -234,7 +273,11 @@ function addGroup(data) {
   if (!data.name) return jsonResponse({ error: "Falta el nombre del grupo." });
 
   var id = data.id || generateId("g");
-  getGroupsSheet().appendRow([id, data.name, data.notes || ""]);
+  var sheet = getGroupsSheet();
+  var rowNumber = sheet.getLastRow() + 1;
+  // Fecha y Hora como texto para que Sheets no las convierta
+  sheet.getRange(rowNumber, 5, 1, 2).setNumberFormat("@");
+  sheet.getRange(rowNumber, 1, 1, GROUP_HEADERS.length).setValues([groupRow(id, data)]);
   return jsonResponse({ success: true, id: id });
 }
 
@@ -246,11 +289,9 @@ function updateGroup(data) {
   var rowIndex = findRowById(sheet, data.id);
   if (rowIndex === -1) return jsonResponse({ error: "No se encontró el grupo." });
 
-  sheet.getRange(rowIndex + 2, 1, 1, GROUP_HEADERS.length).setValues([[
-    data.id,
-    data.name,
-    data.notes || ""
-  ]]);
+  var rowNumber = rowIndex + 2;
+  sheet.getRange(rowNumber, 5, 1, 2).setNumberFormat("@");
+  sheet.getRange(rowNumber, 1, 1, GROUP_HEADERS.length).setValues([groupRow(data.id, data)]);
   return jsonResponse({ success: true });
 }
 

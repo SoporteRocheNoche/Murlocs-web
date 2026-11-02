@@ -10,7 +10,7 @@
  */
 const CONFIG = {
     // URL del Web App de Google Apps Script (termina en /exec)
-    SHEETS_API_URL: "https://script.google.com/macros/s/AKfycbx1EH_hGrVqzAqBiBwdzN9uYeGhLMQsSPWVGM0M8wcmaZ0U4Nkmb_5TKcEA6Yir2GR0CQ/exec",
+    SHEETS_API_URL: "https://script.google.com/macros/s/AKfycbwA-zN_Xt10kvGEJ7v2YIv18hyr3bDK2WsKkUItqChTRUsPfFEaMxl_mScJu3y7bA72sA/exec",
 
     // Diferencia máxima de nivel dentro de un grupo antes de mostrar aviso
     LEVEL_MARGIN: 3,

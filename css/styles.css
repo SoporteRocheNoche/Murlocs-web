@@ -329,6 +329,26 @@ select#playerClass {
     grid-template-columns: 1fr;
 }
 
+.field-wide {
+    grid-column: 1 / -1;
+}
+
+.group-plan {
+    font-size: 0.82rem;
+    margin-top: 8px;
+    padding: 6px 8px;
+    border-radius: 6px;
+    background: rgba(244, 196, 48, 0.08);
+    border-left: 3px solid var(--accent);
+    color: var(--text);
+}
+
+.char-level.out-of-range {
+    background: rgba(255, 123, 114, 0.18);
+    border-color: #ff7b72;
+    color: #ff7b72;
+}
+
 /* --- Grupos (drag & drop) --- */
 .groups-container {
     max-width: 1300px;

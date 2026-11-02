@@ -23,8 +23,22 @@ const els = {
     levelTitle: document.getElementById("levelTitle"),
     levelSelect: document.getElementById("levelSelect"),
     cancelLevelBtn: document.getElementById("cancelLevelBtn"),
-    saveLevelBtn: document.getElementById("saveLevelBtn")
+    saveLevelBtn: document.getElementById("saveLevelBtn"),
+    // Modal de grupo
+    groupModal: document.getElementById("groupModal"),
+    groupForm: document.getElementById("groupForm"),
+    groupName: document.getElementById("groupName"),
+    groupTarget: document.getElementById("groupTarget"),
+    groupDate: document.getElementById("groupDate"),
+    groupTime: document.getElementById("groupTime"),
+    groupMinLevel: document.getElementById("groupMinLevel"),
+    groupMaxLevel: document.getElementById("groupMaxLevel"),
+    groupNotes: document.getElementById("groupNotes"),
+    cancelGroupBtn: document.getElementById("cancelGroupBtn"),
+    groupFormMessage: document.getElementById("groupFormMessage")
 };
+
+let editingGroupId = null;
 
 const MAX_LEVEL = (typeof CONFIG.MAX_LEVEL === "number") ? CONFIG.MAX_LEVEL : 60;
 let levelPlayerId = null;
@@ -40,6 +54,7 @@ async function init() {
     els.refreshBtn.addEventListener("click", function () { loadData(); });
     els.searchInput.addEventListener("input", renderPool);
     initLevelModal();
+    initGroupModal();
 
     // Volver a la pestaña o volver atrás con el navegador: recargar datos
     document.addEventListener("visibilitychange", function () {
@@ -244,9 +259,9 @@ function groupCard(group) {
 
     const renameBtn = document.createElement("button");
     renameBtn.className = "btn-icon edit";
-    renameBtn.title = "Renombrar grupo";
+    renameBtn.title = "Editar grupo";
     renameBtn.textContent = "✏️";
-    renameBtn.addEventListener("click", function () { renameGroup(group); });
+    renameBtn.addEventListener("click", function () { openGroupModal(group); });
 
     const deleteBtn = document.createElement("button");
     deleteBtn.className = "btn-icon delete";
@@ -260,6 +275,10 @@ function groupCard(group) {
     header.appendChild(actions);
     card.appendChild(header);
 
+    // Objetivo, fecha y rango requerido
+    const plan = groupPlan(group);
+    if (plan) card.appendChild(plan);
+
     // Resumen de nivel
     card.appendChild(levelSummary(members));
 
@@ -271,7 +290,7 @@ function groupCard(group) {
     if (members.length === 0) {
         zone.appendChild(emptyHint("Arrastra personajes aquí"));
     } else {
-        members.forEach(function (p) { zone.appendChild(charCard(p)); });
+        members.forEach(function (p) { zone.appendChild(charCard(p, group)); });
     }
 
     card.appendChild(zone);
@@ -319,7 +338,7 @@ function levelSummary(members) {
     return box;
 }
 
-function charCard(p) {
+function charCard(p, group) {
     const card = document.createElement("div");
     card.className = "char-card";
     card.dataset.id = p.id;
@@ -365,6 +384,11 @@ function charCard(p) {
     const l = levelOf(p);
     level.textContent = l === null ? "?" : l;
     level.title = "Nivel";
+    const range = group ? levelRange(group) : null;
+    if (range && l !== null && (l < range.min || l > range.max)) {
+        level.classList.add("out-of-range");
+        level.title = "Fuera del rango " + range.min + "–" + range.max;
+    }
     card.appendChild(level);
 
     card.addEventListener("pointerdown", onPointerDown);
@@ -555,7 +579,10 @@ async function createGroupWith(p) {
     showMessage("Creando grupo...", "");
     try {
         const result = await postAction({ action: "addGroup", name: finalName });
-        groups.push({ id: result.id, name: finalName, notes: "" });
+        groups.push({
+            id: result.id, name: finalName, notes: "",
+            target: "", date: "", time: "", minLevel: "", maxLevel: ""
+        });
 
         await postAction({ action: "setGroup", id: p.id, group: result.id });
         p.group = result.id;
@@ -564,28 +591,6 @@ async function createGroupWith(p) {
         showMessage("Grupo \"" + finalName + "\" creado.", "success");
     } catch (err) {
         showMessage("Error al crear el grupo: " + err.message, "error");
-    } finally {
-        setBusy(false);
-    }
-
-    await loadData({ silent: true });
-}
-
-async function renameGroup(group) {
-    const name = prompt("Nuevo nombre del grupo:", group.name);
-    if (name === null || !name.trim() || name.trim() === group.name) return;
-
-    const previous = group.name;
-    group.name = name.trim();
-    render();
-
-    setBusy(true);
-    try {
-        await postAction({ action: "updateGroup", id: group.id, name: group.name, notes: group.notes || "" });
-    } catch (err) {
-        group.name = previous;
-        render();
-        showMessage("Error al renombrar: " + err.message, "error");
     } finally {
         setBusy(false);
     }
@@ -611,6 +616,132 @@ async function deleteGroup(group) {
         showMessage("Grupo borrado.", "success");
     } catch (err) {
         showMessage("Error al borrar: " + err.message, "error");
+    } finally {
+        setBusy(false);
+    }
+
+    await loadData({ silent: true });
+}
+
+// ---------- Plan del grupo (objetivo, fecha, hora, niveles) ----------
+
+const WEEKDAYS = ["dom", "lun", "mar", "mié", "jue", "vie", "sáb"];
+
+// Rango de nivel requerido; null si no hay ninguno definido
+function levelRange(group) {
+    const min = parseInt(group.minLevel, 10);
+    const max = parseInt(group.maxLevel, 10);
+    if (isNaN(min) && isNaN(max)) return null;
+    return { min: isNaN(min) ? 1 : min, max: isNaN(max) ? MAX_LEVEL : max };
+}
+
+// "2025-06-13" -> "vie 13/06"
+function formatDate(value) {
+    const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(value || ""));
+    if (!m) return String(value || "");
+    const d = new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]));
+    return WEEKDAYS[d.getDay()] + " " + m[3] + "/" + m[2];
+}
+
+function groupPlan(group) {
+    const parts = [];
+    if (group.target) parts.push("🎯 " + group.target);
+
+    const when = [group.date ? formatDate(group.date) : "", group.time || ""]
+        .filter(Boolean).join(" · ");
+    if (when) parts.push("📅 " + when);
+
+    const range = levelRange(group);
+    if (range) parts.push("Niv. " + range.min + "–" + range.max);
+
+    if (parts.length === 0) return null;
+
+    const box = document.createElement("div");
+    box.className = "group-plan";
+    box.textContent = parts.join(" · ");
+    if (group.notes) box.title = group.notes;
+    return box;
+}
+
+function initGroupModal() {
+    els.groupForm.addEventListener("submit", saveGroup);
+    els.cancelGroupBtn.addEventListener("click", closeGroupModal);
+    els.groupModal.addEventListener("click", function (e) {
+        if (e.target === els.groupModal) closeGroupModal();
+    });
+    document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape" && editingGroupId !== null) closeGroupModal();
+    });
+}
+
+function openGroupModal(group) {
+    editingGroupId = group.id;
+    els.groupName.value = group.name || "";
+    els.groupTarget.value = group.target || "";
+    els.groupDate.value = group.date || "";
+    els.groupTime.value = group.time || "";
+    els.groupMinLevel.value = group.minLevel === "" || group.minLevel === undefined ? "" : group.minLevel;
+    els.groupMaxLevel.value = group.maxLevel === "" || group.maxLevel === undefined ? "" : group.maxLevel;
+    els.groupNotes.value = group.notes || "";
+    showGroupFormMessage("", "");
+    els.groupModal.classList.remove("hidden");
+    els.groupName.focus();
+}
+
+function closeGroupModal() {
+    editingGroupId = null;
+    els.groupModal.classList.add("hidden");
+}
+
+function showGroupFormMessage(text, type) {
+    els.groupFormMessage.textContent = text;
+    els.groupFormMessage.className = "message " + (type || "");
+}
+
+async function saveGroup(event) {
+    event.preventDefault();
+
+    const group = groups.find(function (g) { return String(g.id) === String(editingGroupId); });
+    if (!group) {
+        closeGroupModal();
+        return;
+    }
+
+    const minLevel = els.groupMinLevel.value === "" ? "" : parseInt(els.groupMinLevel.value, 10);
+    const maxLevel = els.groupMaxLevel.value === "" ? "" : parseInt(els.groupMaxLevel.value, 10);
+
+    const updated = {
+        name: els.groupName.value.trim(),
+        target: els.groupTarget.value.trim(),
+        date: els.groupDate.value,
+        time: els.groupTime.value,
+        minLevel: minLevel,
+        maxLevel: maxLevel,
+        notes: els.groupNotes.value.trim()
+    };
+
+    if (!updated.name) {
+        showGroupFormMessage("El grupo necesita un nombre.", "error");
+        return;
+    }
+    if (minLevel !== "" && maxLevel !== "" && minLevel > maxLevel) {
+        showGroupFormMessage("El nivel mínimo no puede ser mayor que el máximo.", "error");
+        return;
+    }
+
+    const previous = Object.assign({}, group);
+    Object.assign(group, updated);
+    closeGroupModal();
+    render();
+
+    setBusy(true);
+    try {
+        await postAction(Object.assign({ action: "updateGroup", id: group.id }, updated));
+        showMessage("Grupo \"" + group.name + "\" guardado.", "success");
+    } catch (err) {
+        Object.assign(group, previous);
+        render();
+        showMessage("Error al guardar el grupo: " + err.message, "error");
     } finally {
         setBusy(false);
     }

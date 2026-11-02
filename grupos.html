@@ -55,6 +55,47 @@
         </div>
     </div>
 
+    <div id="groupModal" class="modal-overlay hidden">
+        <div class="modal card">
+            <h2>Editar grupo</h2>
+            <form id="groupForm" class="player-form">
+                <div class="field field-wide">
+                    <label for="groupName">Nombre</label>
+                    <input type="text" id="groupName" required />
+                </div>
+                <div class="field field-wide">
+                    <label for="groupTarget">Objetivo</label>
+                    <input type="text" id="groupTarget" placeholder="Ej. Hall of Thanes" />
+                </div>
+                <div class="field">
+                    <label for="groupDate">Fecha</label>
+                    <input type="date" id="groupDate" />
+                </div>
+                <div class="field">
+                    <label for="groupTime">Hora</label>
+                    <input type="time" id="groupTime" />
+                </div>
+                <div class="field">
+                    <label for="groupMinLevel">Nivel mínimo</label>
+                    <input type="number" id="groupMinLevel" min="1" max="60" />
+                </div>
+                <div class="field">
+                    <label for="groupMaxLevel">Nivel máximo</label>
+                    <input type="number" id="groupMaxLevel" min="1" max="60" />
+                </div>
+                <div class="field field-wide">
+                    <label for="groupNotes">Notas</label>
+                    <input type="text" id="groupNotes" />
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-secondary" id="cancelGroupBtn">Cancelar</button>
+                    <button type="submit" class="btn-primary" id="saveGroupBtn">Guardar</button>
+                </div>
+            </form>
+            <p id="groupFormMessage" class="message"></p>
+        </div>
+    </div>
+
     <script src="js/config.js"></script>
     <script src="js/grupos.js"></script>
 </body>
