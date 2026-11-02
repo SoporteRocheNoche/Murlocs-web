@@ -1,15 +1,6 @@
 {
   "classes": [
     {
-      "name": "Caballero de la Muerte",
-      "color": "#C41E3A",
-      "specs": [
-        { "name": "Sangre", "icon": "img/specs/caballero-de-la-muerte-sangre.jpg" },
-        { "name": "Escarcha", "icon": "img/specs/caballero-de-la-muerte-escarcha.jpg" },
-        { "name": "Profano", "icon": "img/specs/caballero-de-la-muerte-profano.jpg" }
-      ]
-    },
-    {
       "name": "Druida",
       "color": "#FF7C0A",
       "specs": [

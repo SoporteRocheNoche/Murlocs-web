@@ -5,9 +5,6 @@ New-Item -ItemType Directory -Force -Path $outDir | Out-Null
 
 # Mapa: nombre de archivo destino -> nombre del icono en la CDN de Wowhead (WotLK)
 $icons = [ordered]@{
-    "caballero-de-la-muerte-sangre"   = "spell_deathknight_bloodpresence"
-    "caballero-de-la-muerte-escarcha" = "spell_deathknight_frostpresence"
-    "caballero-de-la-muerte-profano"  = "spell_deathknight_unholypresence"
     "druida-equilibrio"               = "spell_nature_starfall"
     "druida-feral"                    = "ability_druid_catform"
     "druida-restauracion"             = "spell_nature_healingtouch"
