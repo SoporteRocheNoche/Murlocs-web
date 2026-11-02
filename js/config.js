@@ -10,5 +10,11 @@
  */
 const CONFIG = {
     // URL del Web App de Google Apps Script (termina en /exec)
-    SHEETS_API_URL: "https://script.google.com/macros/s/AKfycbx4YLDVTpwn2HQRTZ_3tsGYJa-qBNFxIoXBl_ev7Otm_3QfXu0ErqpGx959SOUhYnCzsw/exec"
+    SHEETS_API_URL: "https://script.google.com/macros/s/AKfycbx4YLDVTpwn2HQRTZ_3tsGYJa-qBNFxIoXBl_ev7Otm_3QfXu0ErqpGx959SOUhYnCzsw/exec",
+
+    // Diferencia máxima de nivel dentro de un grupo antes de mostrar aviso
+    LEVEL_MARGIN: 3,
+
+    // Número máximo de personajes por grupo
+    GROUP_SIZE: 5
 };
