@@ -26,6 +26,8 @@ const els = {
     saveLevelBtn: document.getElementById("saveLevelBtn"),
     // Modal de grupo
     groupModal: document.getElementById("groupModal"),
+    groupModalTitle: document.getElementById("groupModalTitle"),
+    clearEventBtn: document.getElementById("clearEventBtn"),
     groupForm: document.getElementById("groupForm"),
     groupName: document.getElementById("groupName"),
     groupTarget: document.getElementById("groupTarget"),
@@ -261,7 +263,13 @@ function groupCard(group) {
     renameBtn.className = "btn-icon edit";
     renameBtn.title = "Editar grupo";
     renameBtn.textContent = "✏️";
-    renameBtn.addEventListener("click", function () { openGroupModal(group); });
+    renameBtn.addEventListener("click", function () { openGroupModal(group, "group"); });
+
+    const eventBtn = document.createElement("button");
+    eventBtn.className = "btn-icon event";
+    eventBtn.title = "Datos del evento";
+    eventBtn.textContent = "🕒";
+    eventBtn.addEventListener("click", function () { openGroupModal(group, "event"); });
 
     const deleteBtn = document.createElement("button");
     deleteBtn.className = "btn-icon delete";
@@ -269,6 +277,7 @@ function groupCard(group) {
     deleteBtn.textContent = "🗑️";
     deleteBtn.addEventListener("click", function () { deleteGroup(group); });
 
+    actions.appendChild(eventBtn);
     actions.appendChild(renameBtn);
     actions.appendChild(deleteBtn);
     header.appendChild(title);
@@ -666,6 +675,14 @@ function groupPlan(group) {
 function initGroupModal() {
     els.groupForm.addEventListener("submit", saveGroup);
     els.cancelGroupBtn.addEventListener("click", closeGroupModal);
+    els.clearEventBtn.addEventListener("click", function () {
+        els.groupTarget.value = "";
+        els.groupDate.value = "";
+        els.groupTime.value = "";
+        els.groupMinLevel.value = "";
+        els.groupMaxLevel.value = "";
+        els.groupTarget.focus();
+    });
     els.groupModal.addEventListener("click", function (e) {
         if (e.target === els.groupModal) closeGroupModal();
     });
@@ -674,8 +691,15 @@ function initGroupModal() {
     });
 }
 
-function openGroupModal(group) {
+function openGroupModal(group, mode) {
+    const isEvent = mode === "event";
     editingGroupId = group.id;
+    els.groupModal.dataset.mode = isEvent ? "event" : "group";
+    els.groupModalTitle.textContent = isEvent
+        ? "Evento de " + (group.name || "")
+        : "Editar grupo";
+
+    // Se rellenan todos los campos; los ocultos conservan su valor al guardar
     els.groupName.value = group.name || "";
     els.groupTarget.value = group.target || "";
     els.groupDate.value = group.date || "";
@@ -685,7 +709,7 @@ function openGroupModal(group) {
     els.groupNotes.value = group.notes || "";
     showGroupFormMessage("", "");
     els.groupModal.classList.remove("hidden");
-    els.groupName.focus();
+    (isEvent ? els.groupTarget : els.groupName).focus();
 }
 
 function closeGroupModal() {
