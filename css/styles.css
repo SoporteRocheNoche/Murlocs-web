@@ -356,12 +356,6 @@ select#playerClass {
     color: var(--text);
 }
 
-.char-level.out-of-range {
-    background: rgba(255, 123, 114, 0.18);
-    border-color: #ff7b72;
-    color: #ff7b72;
-}
-
 /* --- Grupos (drag & drop) --- */
 .groups-container {
     max-width: 1300px;
@@ -471,14 +465,25 @@ select#playerClass {
     background: rgba(255, 255, 255, 0.04);
 }
 
-.group-summary.ok {
-    color: #6ee787;
+.group-summary .level-value {
+    font-weight: 700;
 }
 
-.group-summary.warn {
+.group-summary .spread-warn {
     color: #ffb86b;
-    background: rgba(255, 184, 107, 0.1);
 }
+
+/* Colores de nivel según la actividad */
+.lvl-none { color: #ffffff; }
+.lvl-low  { color: #ff5c5c; }
+.lvl-min  { color: #ff9f43; }
+.lvl-in   { color: #f4d03f; }
+.lvl-high { color: #4ade80; }
+
+.char-level.lvl-low  { border-color: #ff5c5c; background: rgba(255, 92, 92, 0.15); }
+.char-level.lvl-min  { border-color: #ff9f43; background: rgba(255, 159, 67, 0.15); }
+.char-level.lvl-in   { border-color: #f4d03f; background: rgba(244, 208, 63, 0.15); }
+.char-level.lvl-high { border-color: #4ade80; background: rgba(74, 222, 128, 0.15); }
 
 .dropzone {
     border: 2px dashed transparent;

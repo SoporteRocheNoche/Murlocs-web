@@ -289,7 +289,7 @@ function groupCard(group) {
     if (plan) card.appendChild(plan);
 
     // Resumen de nivel
-    card.appendChild(levelSummary(members));
+    card.appendChild(levelSummary(members, group));
 
     // Zona de soltar
     const zone = document.createElement("div");
@@ -319,7 +319,30 @@ function newGroupCard() {
     return card;
 }
 
-function levelSummary(members) {
+// Estado de un nivel respecto al rango de la actividad:
+//  none  -> sin actividad (blanco)
+//  low   -> por debajo del mínimo (rojo)
+//  min   -> justo en el mínimo (naranja)
+//  in    -> dentro del rango, o rango de un solo nivel y coincide (amarillo)
+//  high  -> en el máximo o por encima (verde)
+function levelStatus(level, range) {
+    if (!range || level === null || level === undefined) return "none";
+    if (level < range.min) return "low";
+    if (range.min === range.max && level === range.min) return "in";
+    if (level === range.min) return "min";
+    if (level >= range.max) return "high";
+    return "in";
+}
+
+const LEVEL_STATUS_TEXT = {
+    none: "Sin actividad programada",
+    low: "Por debajo del nivel requerido",
+    min: "En el nivel mínimo",
+    in: "Dentro del rango",
+    high: "En el nivel máximo o superior"
+};
+
+function levelSummary(members, group) {
     const box = document.createElement("div");
     box.className = "group-summary";
 
@@ -334,14 +357,22 @@ function levelSummary(members) {
     const max = Math.max.apply(null, levels);
     const avg = Math.round(levels.reduce(function (a, b) { return a + b; }, 0) / levels.length);
     const spread = max - min;
+    const range = group ? levelRange(group) : null;
 
-    box.textContent = "Nivel " + (min === max ? min : min + "–" + max) + " · media " + avg;
+    box.appendChild(document.createTextNode("Nivel " + (min === max ? min : min + "–" + max) + " · media "));
+
+    const avgEl = document.createElement("span");
+    const status = levelStatus(avg, range);
+    avgEl.className = "level-value lvl-" + status;
+    avgEl.textContent = avg;
+    avgEl.title = LEVEL_STATUS_TEXT[status];
+    box.appendChild(avgEl);
 
     if (spread > LEVEL_MARGIN) {
-        box.classList.add("warn");
-        box.textContent += " · ⚠️ diferencia de " + spread + " niveles";
-    } else {
-        box.classList.add("ok");
+        const warn = document.createElement("span");
+        warn.className = "spread-warn";
+        warn.textContent = " · ⚠️ diferencia de " + spread + " niveles";
+        box.appendChild(warn);
     }
 
     return box;
@@ -394,10 +425,11 @@ function charCard(p, group) {
     level.textContent = l === null ? "?" : l;
     level.title = "Nivel";
     const range = group ? levelRange(group) : null;
-    if (range && l !== null && (l < range.min || l > range.max)) {
-        level.classList.add("out-of-range");
-        level.title = "Fuera del rango " + range.min + "–" + range.max;
-    }
+    const status = levelStatus(l, range);
+    level.classList.add("lvl-" + status);
+    level.title = range
+        ? "Nivel " + (l === null ? "?" : l) + " · " + LEVEL_STATUS_TEXT[status] + " (" + range.min + "–" + range.max + ")"
+        : "Nivel";
     card.appendChild(level);
 
     card.addEventListener("pointerdown", onPointerDown);
