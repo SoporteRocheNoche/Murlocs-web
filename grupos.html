@@ -39,6 +39,22 @@
         </div>
     </main>
 
+    <div id="levelModal" class="modal-overlay hidden">
+        <div class="modal card level-modal">
+            <h2 id="levelTitle">Cambiar nivel</h2>
+            <form id="levelForm" class="player-form">
+                <div class="field">
+                    <label for="levelSelect">Nivel</label>
+                    <select id="levelSelect"></select>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-secondary" id="cancelLevelBtn">Cancelar</button>
+                    <button type="submit" class="btn-primary" id="saveLevelBtn">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script src="js/config.js"></script>
     <script src="js/grupos.js"></script>
 </body>

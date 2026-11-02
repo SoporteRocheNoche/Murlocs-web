@@ -321,6 +321,14 @@ select#playerClass {
     gap: 10px;
 }
 
+.level-modal {
+    max-width: 320px;
+}
+
+.level-modal .player-form {
+    grid-template-columns: 1fr;
+}
+
 /* --- Grupos (drag & drop) --- */
 .groups-container {
     max-width: 1300px;

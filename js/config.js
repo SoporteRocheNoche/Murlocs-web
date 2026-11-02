@@ -16,5 +16,8 @@ const CONFIG = {
     LEVEL_MARGIN: 3,
 
     // Número máximo de personajes por grupo
-    GROUP_SIZE: 5
+    GROUP_SIZE: 5,
+
+    // Nivel máximo seleccionable
+    MAX_LEVEL: 60
 };

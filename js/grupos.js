@@ -16,8 +16,19 @@ const els = {
     groupsList: document.getElementById("groupsList"),
     searchInput: document.getElementById("searchInput"),
     refreshBtn: document.getElementById("refreshBtn"),
-    message: document.getElementById("groupsMessage")
+    message: document.getElementById("groupsMessage"),
+    // Modal de nivel
+    levelModal: document.getElementById("levelModal"),
+    levelForm: document.getElementById("levelForm"),
+    levelTitle: document.getElementById("levelTitle"),
+    levelSelect: document.getElementById("levelSelect"),
+    cancelLevelBtn: document.getElementById("cancelLevelBtn"),
+    saveLevelBtn: document.getElementById("saveLevelBtn")
 };
+
+const MAX_LEVEL = (typeof CONFIG.MAX_LEVEL === "number") ? CONFIG.MAX_LEVEL : 60;
+let levelPlayerId = null;
+let suppressClick = false;
 
 document.addEventListener("DOMContentLoaded", init);
 
@@ -28,6 +39,7 @@ async function init() {
     await loadMasterData();
     els.refreshBtn.addEventListener("click", function () { loadData(); });
     els.searchInput.addEventListener("input", renderPool);
+    initLevelModal();
 
     // Volver a la pestaña o volver atrás con el navegador: recargar datos
     document.addEventListener("visibilitychange", function () {
@@ -356,6 +368,11 @@ function charCard(p) {
     card.appendChild(level);
 
     card.addEventListener("pointerdown", onPointerDown);
+    card.addEventListener("click", function () {
+        if (suppressClick || busy) return;
+        openLevelModal(p.id);
+    });
+    card.title = "Clic para cambiar el nivel";
     return card;
 }
 
@@ -442,6 +459,12 @@ function onPointerUp(e) {
     const valid = target && isValidDrop(target);
 
     cleanupDrag();
+
+    if (wasDragging) {
+        // El navegador lanza un click al soltar; ignorarlo tras un arrastre
+        suppressClick = true;
+        setTimeout(function () { suppressClick = false; }, 0);
+    }
 
     if (wasDragging && valid) {
         handleDrop(id, target.dataset.group);
@@ -588,6 +611,78 @@ async function deleteGroup(group) {
         showMessage("Grupo borrado.", "success");
     } catch (err) {
         showMessage("Error al borrar: " + err.message, "error");
+    } finally {
+        setBusy(false);
+    }
+
+    await loadData({ silent: true });
+}
+
+// ---------- Nivel ----------
+
+function initLevelModal() {
+    for (let i = 1; i <= MAX_LEVEL; i++) {
+        const opt = document.createElement("option");
+        opt.value = i;
+        opt.textContent = i;
+        els.levelSelect.appendChild(opt);
+    }
+
+    els.levelForm.addEventListener("submit", saveLevel);
+    els.cancelLevelBtn.addEventListener("click", closeLevelModal);
+    els.levelModal.addEventListener("click", function (e) {
+        if (e.target === els.levelModal) closeLevelModal();
+    });
+    document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape" && levelPlayerId !== null) closeLevelModal();
+    });
+}
+
+function openLevelModal(playerId) {
+    const p = findPlayer(playerId);
+    if (!p) return;
+
+    levelPlayerId = p.id;
+    els.levelTitle.textContent = "Nivel de " + (p.name || "");
+
+    const current = levelOf(p);
+    els.levelSelect.value = current === null ? 1 : Math.min(Math.max(current, 1), MAX_LEVEL);
+
+    els.levelModal.classList.remove("hidden");
+    els.levelSelect.focus();
+}
+
+function closeLevelModal() {
+    levelPlayerId = null;
+    els.levelModal.classList.add("hidden");
+}
+
+async function saveLevel(event) {
+    event.preventDefault();
+
+    const p = findPlayer(levelPlayerId);
+    if (!p) {
+        closeLevelModal();
+        return;
+    }
+
+    const newLevel = parseInt(els.levelSelect.value, 10);
+    const previous = p.level;
+    closeLevelModal();
+
+    if (levelOf(p) === newLevel) return;
+
+    p.level = newLevel;
+    render();
+
+    setBusy(true);
+    try {
+        await postAction({ action: "setLevel", id: p.id, level: newLevel });
+        showMessage(p.name + " ahora es nivel " + newLevel + ".", "success");
+    } catch (err) {
+        p.level = previous;
+        render();
+        showMessage("Error al cambiar el nivel: " + err.message, "error");
     } finally {
         setBusy(false);
     }
