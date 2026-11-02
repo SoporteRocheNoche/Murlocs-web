@@ -489,9 +489,14 @@ function onPointerUp(e) {
     const wasDragging = !!drag.ghost;
     const target = drag.over;
     const id = drag.id;
-    const valid = target && isValidDrop(target);
+    const reason = target ? dropBlockReason(target) : "";
+    const valid = target && reason === null;
 
     cleanupDrag();
+
+    if (wasDragging && reason) {
+        showMessage(reason, "error");
+    }
 
     if (wasDragging) {
         // El navegador lanza un click al soltar; ignorarlo tras un arrastre
@@ -526,15 +531,40 @@ function dropzoneAt(x, y) {
 }
 
 function isValidDrop(zone) {
+    return dropBlockReason(zone) === null;
+}
+
+// Devuelve el motivo por el que no se puede soltar, o null si se puede
+function dropBlockReason(zone) {
     const target = zone.dataset.group;
     const p = findPlayer(drag.id);
-    if (!p) return false;
+    if (!p) return "";
 
     const current = playerGroup(p);
-    if (target === current) return false;
-    if (target === "" || target === NEW_GROUP) return true;
+    if (target === current) return "";
+    if (target === "" || target === NEW_GROUP) return null;
 
-    return membersOf(target).length < GROUP_SIZE;
+    const members = membersOf(target);
+    if (members.length >= GROUP_SIZE) return "El grupo ya está completo.";
+
+    const clash = sameOwnerIn(members, p);
+    if (clash) {
+        return (p.owner || "Este jugador") + " ya tiene a " + clash.name + " en ese grupo.";
+    }
+    return null;
+}
+
+function ownerKey(p) {
+    return String(p.owner || "").trim().toLowerCase();
+}
+
+// Personaje del mismo jugador ya presente en la lista (sin contar al propio personaje)
+function sameOwnerIn(members, p) {
+    const key = ownerKey(p);
+    if (!key) return null;
+    return members.find(function (m) {
+        return String(m.id) !== String(p.id) && ownerKey(m) === key;
+    }) || null;
 }
 
 function autoScroll(clientY) {

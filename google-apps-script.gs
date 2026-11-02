@@ -263,6 +263,22 @@ function setPlayerGroup(data) {
   var rowIndex = findRowById(sheet, data.id);
   if (rowIndex === -1) return jsonResponse({ error: "No se encontró el jugador." });
 
+  // Un jugador no puede tener dos personajes en el mismo grupo
+  if (groupId) {
+    var values = sheet.getDataRange().getValues();
+    var me = values[rowIndex + 1];
+    var owner = String(me[6] || "").trim().toLowerCase();
+    if (owner) {
+      for (var i = 1; i < values.length; i++) {
+        if (i === rowIndex + 1) continue;
+        if (String(values[i][COL_GROUP - 1]) === String(groupId) &&
+            String(values[i][6] || "").trim().toLowerCase() === owner) {
+          return jsonResponse({ error: me[6] + " ya tiene a " + values[i][1] + " en ese grupo." });
+        }
+      }
+    }
+  }
+
   sheet.getRange(rowIndex + 2, COL_GROUP).setValue(groupId);
   return jsonResponse({ success: true });
 }
